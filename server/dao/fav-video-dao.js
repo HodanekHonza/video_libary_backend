@@ -7,71 +7,72 @@ const crypto = require("crypto");
 const rf = fs.promises.readFile;
 const wf = fs.promises.writeFile;
 
-const DEFAULT_STORAGE_PATH = path.join(__dirname, "storage", "subjects.json");
+const DEFAULT_STORAGE_PATH = path.join(__dirname, "storage", "favoritevideos.json");
 
-class SubjectsDao {
+class FavoriteVideoDao {
   constructor(storagePath) {
-    this.subjectStoragePath = storagePath ? storagePath : DEFAULT_STORAGE_PATH;
+    this.favoriteVideoStoragePath = storagePath ? storagePath : DEFAULT_STORAGE_PATH;
   }
 
-  async createSubject(subject) {
-    let subjectlist = await this._loadAllSubjects();
-    let currentSubject = subjectlist.find(
-        (item) => item.shortName === subject.shortName
+  async createFavoriteVideo(video) {
+    let videolist = await this._loadAllFavoriteVideos();
+    let currentSubject = videolist.find(
+        (item) => item.shortName === video.shortName
     );
     if (currentSubject) {
-      throw `subject with shortName ${subject.shortName} already exists in db`;
+      throw `subject with shortName ${video.shortName} already exists in db`;
     }
-    subject.id = crypto.randomBytes(8).toString("hex");
-    subjectlist.push(subject);
-    await wf(this._getStorageLocation(), JSON.stringify(subjectlist, null, 2));
-    return subject;
+    video.id = crypto.randomBytes(8).toString("hex");
+    videolist.push(video);
+    await wf(this._getStorageLocation(), JSON.stringify(videolist, null, 2));
+    return video;
   }
 
-  async getSubject(id) {
-    let subjectlist = await this._loadAllSubjects();
-    const result = subjectlist.find((b) => b.id === id);
+  async getFavoriteVideo(id) {
+    let videolist = await this._loadAllFavoriteVideos();
+    const result = videolist.find((b) => b.id === id);
     return result;
   }
+  
 
-  async updateSubject(subject) {
-    let subjectlist = await this._loadAllSubjects();
-    const subjectIndex = subjectlist.findIndex((b) => b.id === subject.id);
-    if (subjectIndex < 0) {
-      throw new Error(`subject with given id ${subject.id} does not exists`);
+  async updateFavoriteVideo(video) {
+    let videolist = await this._loadAllFavoriteVideos();
+    const videoIndex = videolist.findIndex((b) => b.id === video.id);
+    if (videoIndex < 0) {
+      throw new Error(`subject with given id ${video.id} does not exists`);
     } else {
-      subjectlist[subjectIndex] = {
-        ...subjectlist[subjectIndex],
-        ...subject,
+      videolist[videoIndex] = {
+        ...videolist[videoIndex],
+        ...video,
       };
     }
-    await wf(this._getStorageLocation(), JSON.stringify(subjectlist, null, 2));
-    return subjectlist[subjectIndex];
+    await wf(this._getStorageLocation(), JSON.stringify(videolist, null, 2));
+    return videolist[videoIndex];
   }
 
-  async deleteSubject(id) {
-    let subjectlist = await this._loadAllSubjects();
-    const subjectIndex = subjectlist.findIndex((b) => b.id === id);
-    if (subjectIndex >= 0) {
-      subjectlist.splice(subjectIndex, 1);
+  async deleteFavoriteVideo(id) {
+    let videolist = await this._loadAllFavoriteVideos();
+    const favoriteVideoIndex = videolist.findIndex((b) => b.id === id);
+    if (favoriteVideoIndex >= 0) {
+      videolist.splice(favoriteVideoIndex, 1);
     }
-    await wf(this._getStorageLocation(), JSON.stringify(subjectlist, null, 2));
+    await wf(this._getStorageLocation(), JSON.stringify(videolist, null, 2));
     return {};
   }
 
-  async listSubjects() {
-    let subjectlist = await this._loadAllSubjects();
-    return subjectlist;
+  async listFavoriteVideos() {
+    let videolist = await this._loadAllFavoriteVideos();
+    return videolist;
   }
 
-  async _loadAllSubjects() {
-    let subjectlist;
+  async _loadAllFavoriteVideos() {
+    let videolist;
     try {
-      subjectlist = JSON.parse(await rf(this._getStorageLocation()));
+      videolist = JSON.parse(await rf(this._getStorageLocation()));
     } catch (e) {
       if (e.code === "ENOENT") {
         console.info("No storage found, initializing new one...");
-        subjectlist = [];
+        videolist = [];
       } else {
         throw new Error(
             "Unable to read from storage. Wrong data format. " +
@@ -79,12 +80,12 @@ class SubjectsDao {
         );
       }
     }
-    return subjectlist;
+    return videolist;
   }
 
   _getStorageLocation() {
-    return this.subjectStoragePath;
+    return this.favoriteVideoStoragePath;
   }
 }
 
-module.exports = SubjectsDao;
+module.exports = FavoriteVideoDao;

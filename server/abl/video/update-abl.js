@@ -8,12 +8,17 @@ let dao = new VideoDao(
 let schema = {
     type: "object",
     properties: {
-        id: { type: "string" },
-        firstname: { type: "string" },
-        surname: { type: "string" },
+        url: { type: "string" },
+        name: { type: "string" },
+        creator: { type: "string" },
+        length: { type: "number" },
+        dateofcreation: { type: "date" },
+        topic: { type: "string" },
+        description: { type: "string" },
     },
-    required: ["id"],
+    required: ["name", "url"],
 };
+
 
 async function UpdateAbl(req, res) {
     try {

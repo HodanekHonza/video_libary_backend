@@ -8,11 +8,15 @@ let dao = new VideoDao(
 let schema = {
     type: "object",
     properties: {
+        url: { type: "string" },
         name: { type: "string" },
-        shortName: { type: "string" },
+        creator: { type: "string" },
+        length: { type: "number" },
+        dateofcreation: { type: "number" },
+        topic: { type: "string" },
         description: { type: "string" },
     },
-    required: ["name", "shortName"],
+    required: ["url", "name"],
 };
 
 async function CreateAbl(req, res) {
@@ -31,7 +35,7 @@ async function CreateAbl(req, res) {
             });
         }
     } catch (e) {
-        if (e.includes("subject with shortName ")) {
+        if (e.includes("subject with name ")) {
             res.status(400).send({ errorMessage: e, params: req.body });
         } else {
             res.status(500).send(e);
