@@ -1,7 +1,7 @@
 const path = require("path");
 const Ajv = require("ajv").default;
-const VideoDao = require("../../dao/fav-video-dao");
-let dao = new VideoDao(
+const FavoriteVideoDao = require("../../dao/fav-video-dao");
+let dao = new FavoriteVideoDao(
     path.join(__dirname, "..", "..", "storage", "favoritevideos.json")
 );
 

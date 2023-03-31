@@ -19,7 +19,8 @@ router.post("/update", async (req, res) => {
     await UpdateAbl(req, res);
 });
 
-router.post("/delete", async (req, res) => {
+router.delete("/delete/:id", async (req, res) => {
+    console.log("DELETE favorite video route called");
     await DeleteAbl(req, res);
 });
 

@@ -14,65 +14,71 @@ class FavoriteVideoDao {
     this.favoriteVideoStoragePath = storagePath ? storagePath : DEFAULT_STORAGE_PATH;
   }
 
-  async createFavoriteVideo(video) {
-    let videolist = await this._loadAllFavoriteVideos();
-    let currentSubject = videolist.find(
-        (item) => item.shortName === video.shortName
+  async createFavoriteVideo(favoriteVideo) {
+    let favoritevideolist = await this._loadAllFavoriteVideos();
+    let currentFavoriteVideo = favoritevideolist.find(
+        (item) => item.shortName === favoriteVideo.shortName
     );
-    if (currentSubject) {
-      throw `subject with shortName ${video.shortName} already exists in db`;
+    if (currentFavoriteVideo) {
+      throw `subject with shortName ${favoriteVideo.shortName} already exists in db`;
     }
-    video.id = crypto.randomBytes(8).toString("hex");
-    videolist.push(video);
-    await wf(this._getStorageLocation(), JSON.stringify(videolist, null, 2));
-    return video;
+    favoriteVideo.id = crypto.randomBytes(8).toString("hex");
+    favoritevideolist.push(favoriteVideo);
+    await wf(this._getStorageLocation(), JSON.stringify(favoritevideolist, null, 2));
+    return favoriteVideo;
   }
 
   async getFavoriteVideo(id) {
-    let videolist = await this._loadAllFavoriteVideos();
-    const result = videolist.find((b) => b.id === id);
+    let favoritevideolist = await this._loadAllFavoriteVideos();
+    const result = favoritevideolist.find((b) => b.id === id);
     return result;
   }
   
 
-  async updateFavoriteVideo(video) {
-    let videolist = await this._loadAllFavoriteVideos();
-    const videoIndex = videolist.findIndex((b) => b.id === video.id);
+  async updateFavoriteVideo(favoriteVideo) {
+    let favoritevideolist = await this._loadAllFavoriteVideos();
+    const videoIndex = favoritevideolist.findIndex((b) => b.id === favoriteVideo.id);
     if (videoIndex < 0) {
-      throw new Error(`subject with given id ${video.id} does not exists`);
+      throw new Error(`subject with given id ${favoriteVideo.id} does not exists`);
     } else {
-      videolist[videoIndex] = {
-        ...videolist[videoIndex],
-        ...video,
+      favoritevideolist[videoIndex] = {
+        ...favoritevideolist[videoIndex],
+        ...favoriteVideo,
       };
     }
-    await wf(this._getStorageLocation(), JSON.stringify(videolist, null, 2));
-    return videolist[videoIndex];
+    await wf(this._getStorageLocation(), JSON.stringify(favoritevideolist, null, 2));
+    return favoritevideolist[videoIndex];
   }
 
   async deleteFavoriteVideo(id) {
     let videolist = await this._loadAllFavoriteVideos();
-    const favoriteVideoIndex = videolist.findIndex((b) => b.id === id);
-    if (favoriteVideoIndex >= 0) {
-      videolist.splice(favoriteVideoIndex, 1);
+    console.log("Original video list:", videolist);
+    const videoIndex = videolist.findIndex((b) => b.id === id);
+    console.log("Index of video to delete:", videoIndex);
+    if (videoIndex >= 0) {
+      videolist.splice(videoIndex, 1);
+    } else {
+      console.log("Video not found, not deleting.");
     }
     await wf(this._getStorageLocation(), JSON.stringify(videolist, null, 2));
+    console.log("Updated video list:", videolist);
     return {};
   }
+  
 
   async listFavoriteVideos() {
-    let videolist = await this._loadAllFavoriteVideos();
-    return videolist;
+    let favoritevideolist = await this._loadAllFavoriteVideos();
+    return favoritevideolist;
   }
 
   async _loadAllFavoriteVideos() {
-    let videolist;
+    let favoritevideolist;
     try {
-      videolist = JSON.parse(await rf(this._getStorageLocation()));
+      favoritevideolist = JSON.parse(await rf(this._getStorageLocation()));
     } catch (e) {
       if (e.code === "ENOENT") {
         console.info("No storage found, initializing new one...");
-        videolist = [];
+        favoritevideolist = [];
       } else {
         throw new Error(
             "Unable to read from storage. Wrong data format. " +
@@ -80,7 +86,7 @@ class FavoriteVideoDao {
         );
       }
     }
-    return videolist;
+    return favoritevideolist;
   }
 
   _getStorageLocation() {

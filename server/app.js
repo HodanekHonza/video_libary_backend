@@ -22,13 +22,12 @@ app.get("/", (req, res) => {
     res.send("Hello World!");
 });
 
-
 app.use("/video", videoRouter);
 app.use("/favoritevideo", favoriteVideoRouter);
 
 
 app.get("/*", (req, res) => {
-    res.send("Unknown path!");
+    res.send(`Unknown path: ${req.method} ${req.path}`);
 });
 
 //nastavení portu, na kterém má běžet HTTP server
